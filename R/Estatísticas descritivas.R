@@ -1,6 +1,6 @@
 
 # carregando pacotes ------------------------------------------------------
-
+library(usethis)
 library(tidyverse)
 # install.packages("googlesheets4")
 
@@ -19,6 +19,6 @@ dados <- read.csv("data/health_data.csv")
 
 str(dados)
 glimpse(dados)
-summary(dados)
+
 
 
