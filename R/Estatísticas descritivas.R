@@ -21,4 +21,4 @@ str(dados)
 glimpse(dados)
 
 
-
+table(dados$Diabetes)
