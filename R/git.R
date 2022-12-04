@@ -2,8 +2,8 @@ library(usethis)
 
 # Uma vez na vida
 use_git_config(
-  user.name = "USUÁRIO",
-  user.email = "EMAIL"
+  user.name = "RosanaAlves",
+  user.email = "rosanaalvesmolina7@gmail.com"
 )
 
 # Uma vez na vida
