@@ -20,3 +20,4 @@ gitcreds::gitcreds_set()
 
 # Uma ver por projeto
 use_github()
+#usethis::edit_r_environ() editar
