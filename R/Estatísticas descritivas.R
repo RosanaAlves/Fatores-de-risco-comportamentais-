@@ -139,6 +139,28 @@ plot(roc1,
 # sugerem um tamanho de amostra de pelo menos 50 casos para a realização deste teste.
 #A hipótese nula H\({_0}\) do qui-quadrado (p=0,05) deste teste é a de que as proporções observadas e esperadas são as mesmas ao longo da amostra. Abaixo segue a estrutura do teste, sendo que o modelo apresenta dificuldade de ajuste em função de que rejeita a hipótese nula a p=0,05.
 
-# -------------------------------------------------------------------------
+
+require(ResourceSelection)
+
+hl <- hoslem.test(dados2$Diabetes,fitted(m1),g=10)
+
+hl
+
+## Pseudo R²
+
+# install.packages("modEvA")
+
+# require(modEvA)
+ # RsqGLM(m1)
 
 
+## Regressão Logística Múltipla
+
+require(haven)
+logit=glm(Diabetes~CholCheck+MentHlth+Sex+Age+Fruits, data = dados2, family = binomial(link="logit"))
+summary(logit)
+
+#Observa-se que os valores estimados mostram os coeficientes em formato logarítmo de chances.
+# Assim, quando Cholcheck eleva-se em 1 (uma) unidade, o log das chances esperado para Cholcheck altera-se em 1.666.
+
+# Pred e fruit inter 
