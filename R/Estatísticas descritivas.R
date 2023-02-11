@@ -3,6 +3,7 @@
 library(usethis)
 library(tidyverse)
 library(httr)
+library(tibble)
 
 # -------------------------------------------------------------------------
 
@@ -10,9 +11,24 @@ library(httr)
 # carregando o arquivo ----------------------------------------------------
 
 dados <- read.csv("data/health_data.csv")
+dados <- tibble(dados)
 dados$Diabetes <- as.factor(dados$Diabetes) 
-#vdados2 <- read_delim("data/health_data.csv", ",", escape_double = FALSE, col_types = cols(Diabetes = col_factor(levels = c())))
-dados2 <- dados
+dados$Sex <- as.factor(dados$Sex)
+dados$HighChol <- as.factor(dados$HighChol)
+dados$CholCheck <- as.factor(dados$CholCheck)
+dados$Smoker <- as.factor(dados$Smoker)
+dados$HeartDiseaseorAttack <- as.factor(dados$HeartDiseaseorAttack)
+dados$PhysActivity <- as.factor(dados$PhysActivity)
+dados$Fruits <-  as.factor(dados$Fruits)
+dados$Veggies <- as.factor(dados$Veggies)
+dados$HvyAlcoholConsump <- as.factor(dados$HvyAlcoholConsump)
+dados$GenHlth <- as.factor(dados$GenHlth)
+dados$DiffWalk <- as.factor(dados$DiffWalk)
+dados$Hypertension   <- as.factor(dados$Hypertension)
+dados$Stroke <- as.factor(dados$Stroke)
+
+# dados2 <- read_delim("data/health_data.csv", ",", escape_double = FALSE, col_types = cols(Diabetes = col_factor(levels = c())))
+dados2 <-dados
 
 # Posso extrair direto do site
 # Pacote readr
@@ -26,7 +42,6 @@ table(dados$Diabetes)
 
 
 # selecinonado mulheres ---------------------------------------------------
-
 
 
 fem <- dados%>% filter(Sex == 0)
@@ -53,9 +68,6 @@ plot(diabete_colest$Diabetes,diabete_colest$HighChol)
 ##                   "ResourceSelection","modEvA","foreign","stargazer"))
 
 summary(dados2)
-
-# Talvez seja necessario tranformar a variavel dependente em um fator, para aplicação do modelo
-
 require(ggplot2)
 
 ggplot(dados2, aes(x=Age, y=Diabetes)) + 
@@ -157,10 +169,84 @@ hl
 ## Regressão Logística Múltipla
 
 require(haven)
-logit=glm(Diabetes~CholCheck+MentHlth+Sex+Age+Fruits, data = dados2, family = binomial(link="logit"))
+logit=glm(Diabetes~Age+Sex+HighChol+CholCheck+BMI+Smoker+HeartDiseaseorAttack+PhysActivity+Fruits+Veggies+HvyAlcoholConsump+GenHlth+MentHlth+PhysHlth+DiffWalk+Hypertension+Stroke, data = dados2, family = binomial(link="logit"))
 summary(logit)
 
-#Observa-se que os valores estimados mostram os coeficientes em formato logarítmo de chances.
-# Assim, quando Cholcheck eleva-se em 1 (uma) unidade, o log das chances esperado para Cholcheck altera-se em 1.666.
 
-# Pred e fruit inter 
+#Observa-se que os valores estimados mostram os coeficientes em formato logarítmo de chances.
+# Assim, quando Cholcheck eleva-se em 1 (uma) unidade, o log das chances esperado para Cholcheck altera-se em 1.31.
+
+require(stargazer)
+stargazer(logit, title="Resultados",type = "text")
+# 
+# A razão de chances (OR - odds ratio em inglês) estimada
+# no modelo terá de ser transformada por estar apresentada na forma 
+# logarítma conforme o modelo de regressão logística o estima. Assim,
+# utiliza-se o pacote mfx para efetuar esta transformação para todo o 
+# modelo de forma automatizada
+
+require(mfx)
+logitor(Diabetes~Age+Sex+HighChol+CholCheck+BMI+Smoker+HeartDiseaseorAttack+PhysActivity+Fruits+Veggies+HvyAlcoholConsump+GenHlth+MentHlth+PhysHlth+DiffWalk+Hypertension+Stroke, data = dados)
+# a chance de Diabetes=1 é 0,753 vezes maior quando Fruits aumenta em uma unidade (sendo que aqui mantêm-se as demais variáveis independentes constantes).
+
+#Para facilitar a interpretação do modelo, se torna mais fácil depois 
+# de transformado a sua exponenciação dos coeficientes logísticos utilizando 
+# o comando exp(coef(logit)). Desta forma, para cada incremento unitário em cholchek 
+# e mantendo as demais variáveis constantes, conclui-se que é 5,26 vezes provável que y seja igual a 1 em oposição a não ser (igual a zero), ou seja, as chances aumentam em 426%.
+exp(coef(logit))
+
+# O intervalo de confiança do modelo pode ser exposto utilizando o comando confint para os coeficientes estimados, como segue abaixo:
+exp(cbind(OR=coef(logit), confint(logit)))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Prediçoes
+
+allmean = data.frame(CholCheck=mean(dados2$CholCheck),
+                     MentHlth=mean(dados2$MentHlth),
+                     Sex=mean(dados2$Sex),
+                     Age=mean(dados2$Age),
+                     Fruits=mean(dados$Fruits))
+allmean
+allmean$pred.prob = predict(logit, newdata=allmean, type="response")
+allmean
+
+# Como resultado, o modelo informa que constando os valores médios das variáveis independentes, obtêm-se a probabilidade de 49% em y se constituir igual a 1.
+
+
+## Método Stepwise
+
+# O método Stepwise auxilia o pesquisador em selecionar as variáveis importantes ao modelo, sendo que podem ser utilizadas nas direções “both”, “backward”, “forward”. Este método, por sua vez, utiliza o Critério de Informação de Akaike (AIC - Akaike Information Criterion) na combinação das variáveis dos diversos modelos simulados para selecionar o modelo mais ajustado. Quanto menor o AIC, melhor o ajuste do modelo. 
+step(logit, direction = 'both')
+
+## VIF - Variance Inflation Factor
+
+# índice o qual não deve ficar abaixo de 10 para representar baixo problema de multicolinearidade segundo Rawlings, Pantula, e Dickey (1998).
+
+require(faraway)
+vif(logit)
+
+
+
