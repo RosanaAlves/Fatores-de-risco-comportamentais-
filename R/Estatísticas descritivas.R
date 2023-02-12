@@ -162,8 +162,13 @@ hl
 
 # install.packages("modEvA")
 
-# require(modEvA)
- # RsqGLM(m1)
+require(modEvA)
+RsqGLM(m1)
+
+
+
+
+
 
 
 ## Regressão Logística Múltipla
@@ -224,21 +229,34 @@ exp(cbind(OR=coef(logit), confint(logit)))
 
 ## Prediçoes
 
-allmean = data.frame(CholCheck=mean(dados2$CholCheck),
-                     MentHlth=mean(dados2$MentHlth),
-                     Sex=mean(dados2$Sex),
-                     Age=mean(dados2$Age),
-                     Fruits=mean(dados$Fruits))
-allmean
-allmean$pred.prob = predict(logit, newdata=allmean, type="response")
-allmean
-
+# allmean = data.frame(Age <- mean(dados2$Age),
+#                      Sex <- mean(dados2$Sex),
+#                      HighChol <- mean(dados2$HighChol),
+#                      CholCheck <- mean(dados2$CholCheck),
+#                      BMI <- mean(dados2$BMI),
+#                      Smoker <- mean(dados2$Smoker),
+#                      HeartDiseaseorAttack <- mean(dados2$HeartDiseaseorAttack),
+#                      PhysActivity <- mean(dados2$PhysActivity),
+#                      Fruits <- mean(dados2$Fruits),
+#                      Veggies <- mean(dados2$Veggies),
+#                      HvyAlcoholConsump <- mean(dados2$HvyAlcoholConsump),
+#                      GenHlth <- mean(dados2$GenHlth),
+#                      MentHlth <- mean(dados2$MentHlth),
+#                      PhysHlth <- mean(dados2$PhysHlth),
+#                      DiffWalk <- mean(dados2$DiffWalk),
+#                      Hypertension <- mean(dados2$Hypertension),
+#                      Stroke <- mean(dados2$Stroke))
+# allmean
+# allmean$pred.prob = predict(logit, newdata=allmean, type="response")
+# allmean
 # Como resultado, o modelo informa que constando os valores médios das variáveis independentes, obtêm-se a probabilidade de 49% em y se constituir igual a 1.
 
+PRED <-  predict(logit,  type="response")
 
 ## Método Stepwise
 
 # O método Stepwise auxilia o pesquisador em selecionar as variáveis importantes ao modelo, sendo que podem ser utilizadas nas direções “both”, “backward”, “forward”. Este método, por sua vez, utiliza o Critério de Informação de Akaike (AIC - Akaike Information Criterion) na combinação das variáveis dos diversos modelos simulados para selecionar o modelo mais ajustado. Quanto menor o AIC, melhor o ajuste do modelo. 
+
 step(logit, direction = 'both')
 
 ## VIF - Variance Inflation Factor
